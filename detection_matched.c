@@ -1,4 +1,4 @@
-// make a color map of sensitivity as a function scintillation time-scale and bandwidth
+// Sensitivity map of matched filter as a function of scintillation time-scale and bandwidth for a given survey
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -26,8 +26,8 @@ int main (int argc, char* argv[])
 	noiseStruct noiseStructure;
 
 	char fname[1024];   // read in parameter file
-	char Tname[1024];   // read in number of subint
-	char Fname[1024];   // read in number of channel
+	char Tname[1024];   // read in scintillation time-scales
+	char Fname[1024];   // read in scintillation bandwidth
 
 	int nt;
 	double *tdiss;
@@ -114,19 +114,17 @@ int main (int argc, char* argv[])
 
 		for (i=id; i<nt; i+=p)
 		{
-			//control.nsub = pow(10.0, tdiss[i]);
-			control.nsub = tdiss[i];
-			control.tsub = control.T/(double)(control.nsub);
-			control.scint_ts = control.tsub/2.0;
+			control.scint_ts = pow(10.0, tdiss[i]);
+			control.tsub = control.scint_ts*2.0;
+			control.T = control.tsub*control.nsub;
 
 			for (j=0; j<nf; j++)
 			{
-				//control.nchan = pow(10.0, fdiss[j]);
-				control.nchan = fdiss[j];
-				control.chanBW = control.BW/(double)(control.nchan);
-				control.scint_freqbw = control.chanBW/2.0;
+				control.scint_freqbw = pow(10.0, fdiss[j]);
+				control.chanBW = control.scint_freqbw*2.0;
+				control.BW = control.chanBW*control.nchan;
 
-				control.whiteLevel = control.whiteLevel0*sqrt(control.nsub*control.nchan);  // 0.1 gives 1 to a 10*10 dynamic spectrum
+				control.whiteLevel = control.whiteLevel0*sqrt(control.T_tot/control.T)*sqrt(control.BW_tot/control.BW)*sqrt(control.nsub*control.nchan);  
 		
 				calNoise (&noiseStructure, &control);
 
@@ -168,7 +166,9 @@ int main (int argc, char* argv[])
 					//printf ("%lf %f %d\n", control.cFlux, acfStructure.probability, nMax);
 				}
 					
-				printf ("%d %d %lf %lf %f %lf %d\n", control.nsub, control.nchan, control.whiteLevel, noiseStructure.detection, control.cFlux, acfStructure.probability, nMax);
+				control.cFlux = control.cFlux*sqrt(control.T/control.T_tot)*sqrt(control.BW/control.BW_tot);
+
+				printf ("%lf %lf %lf %lf %f %lf %d\n", control.scint_ts, control.scint_freqbw, control.whiteLevel, noiseStructure.detection, control.cFlux, acfStructure.probability, nMax);
 				fflush (stdout);
 
 				deallocateMemory (&acfStructure);

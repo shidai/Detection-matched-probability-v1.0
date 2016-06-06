@@ -61,6 +61,9 @@ typedef struct controlStruct {
 	//char oname[1024]; // output file name
 	char dname[1024]; // graphics device
 
+	double T_tot; // total integration time of the survey
+	double BW_tot; // total BW of the survey
+
 	double T; // total integration time
 	double BW; // total BW
 	double cFreq;  // observing central frequency
@@ -257,7 +260,7 @@ int calculateScintScale (acfStruct *acfStructure, controlStruct *control)
 	acfStructure->cFreq = control->cFreq; // MHz
 	acfStructure->bw = fabs(control->chanBW*control->nchan); // MHz
 	acfStructure->tint = control->nsub*control->tsub;  // s
-	//acfStructure->tint = control->T;  // s
+
 	acfStructure->f0 = control->scint_freqbw;  // MHz
 	acfStructure->t0 = control->scint_ts; // s
 
@@ -1038,19 +1041,19 @@ int readParams(char *fname, char *dname, int n, controlStruct *control)
 			//	fscanf(fin,"%lf",&(control->scint_ts));
 			//else if (strcasecmp(param,"SCINT_FREQBW")==0)
 			//	fscanf(fin,"%lf",&(control->scint_freqbw));	  
-			if (strcasecmp(param,"T")==0)
-      				fscanf(fin,"%lf",&(control->T));
-			else if (strcasecmp(param,"BW")==0)
-      				fscanf(fin,"%lf",&(control->BW));
+			if (strcasecmp(param,"T_TOT")==0)
+      				fscanf(fin,"%lf",&(control->T_tot));
+			else if (strcasecmp(param,"BW_TOT")==0)
+      				fscanf(fin,"%lf",&(control->BW_tot));
 			else if (strcasecmp(param,"CFREQ")==0)
       				fscanf(fin,"%lf",&(control->cFreq));
 			//else if (strcasecmp(param,"CHAN_BW")==0)
       			//	fscanf(fin,"%lf",&(control->chanBW));
-			//else if (strcasecmp(param,"NCHAN")==0)
-			//     	fscanf(fin,"%d",&(control->nchan));
-			//else if (strcasecmp(param,"NSUB")==0)
-      			//	fscanf(fin,"%d",&(control->nsub));
-			else if (strcasecmp(param,"WHITE_LEVEL")==0)
+			else if (strcasecmp(param,"NCHAN")==0)
+			     	fscanf(fin,"%d",&(control->nchan));
+			else if (strcasecmp(param,"NSUB")==0)
+      				fscanf(fin,"%d",&(control->nsub));
+			else if (strcasecmp(param,"WHITE_LEVEL")==0)    // noise level of the survey
       				fscanf(fin,"%lf",&(control->whiteLevel0));
 			else if (strcasecmp(param,"CFLUX0")==0)
 			      	fscanf(fin,"%lf",&(control->cFlux0));
@@ -1099,6 +1102,9 @@ void initialiseControl(controlStruct *control)
 	control->n = 1; // simulate 1 dynamic spectrum by default
 
 	// Standard defaults
+	control->T = 10000.0;
+	control->BW = 10000.0;
+
 	control->T = 1000.0;
 	control->BW = 1000.0;
 	control->nchan = 10;
