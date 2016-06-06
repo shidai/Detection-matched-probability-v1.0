@@ -127,6 +127,7 @@ int main (int argc, char* argv[])
 				control.whiteLevel = control.whiteLevel0*sqrt(control.T_tot/control.T)*sqrt(control.BW_tot/control.BW)*sqrt(control.nsub*control.nchan);  
 		
 				calNoise (&noiseStructure, &control);
+				//printf ("%lf\n", control.whiteLevel);
 
 				flux0 = control.cFlux0;
 				flux1 = control.cFlux1;
@@ -134,7 +135,6 @@ int main (int argc, char* argv[])
 				acfStructure.probability = 1.0;
 					
 				calculateScintScale (&acfStructure, &control);
-				//printf ("calculateScintScal\n");
 
 				nMax = 0;
 				while (fabs(acfStructure.probability-0.8) >= control.precision && nMax <= 100)

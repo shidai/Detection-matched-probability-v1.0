@@ -167,22 +167,27 @@ int calNoise (noiseStruct *noiseStructure, controlStruct *control)
 
 int calThreshold (noiseStruct *noiseStructure, float *var_n)
 {
-	int i;
+	int i, nMax;
 	int n = noiseStructure->n;
 
-	float max;
+	float max, min;
 	float percent;
-	float threshold;
+	double threshold;
 	int num;
 
 	max = find_max_value (n, var_n);
+	min = find_min_value (n, var_n);
 	//printf ("Results: %f %f %f %f\n", meanVar, varVar, meanVarN, varVar_n);
 	
 	percent = 1.0;
-	threshold = max;
-	while (percent >= 0.95)
+	nMax = 0;
+	//threshold = max;
+	//while (percent >= 0.95)
+	while (fabs(percent-0.95) >= 0.001 && nMax <= 100)
 	{
-		threshold -= 0.01;
+		//threshold = threshold - 0.01;
+		threshold = min+(max-min)/2.0;
+
 		num = 0;
 		for (i=0; i<n; i++)
 		{
@@ -192,6 +197,18 @@ int calThreshold (noiseStruct *noiseStructure, float *var_n)
 			}
 		}
 		percent = (float)(num)/n;
+		
+		if (percent > 0.95)
+		{
+			max = threshold;
+		}
+		else
+		{
+			min = threshold;
+		}
+		nMax++;
+
+		//printf ("%.6lf %.6lf %d\n", threshold, percent, num);
 	}
 
 	noiseStructure->detection = threshold;
