@@ -114,13 +114,15 @@ int main (int argc, char* argv[])
 
 		for (i=id; i<nt; i+=p)
 		{
-			control.nsub = pow(10.0, tdiss[i]);
+			//control.nsub = pow(10.0, tdiss[i]);
+			control.nsub = tdiss[i];
 			control.tsub = control.T/(double)(control.nsub);
 			control.scint_ts = control.tsub/2.0;
 
 			for (j=0; j<nf; j++)
 			{
-				control.nchan = pow(10.0, fdiss[j]);
+				//control.nchan = pow(10.0, fdiss[j]);
+				control.nchan = fdiss[j];
 				control.chanBW = control.BW/(double)(control.nchan);
 				control.scint_freqbw = control.chanBW/2.0;
 
@@ -166,7 +168,7 @@ int main (int argc, char* argv[])
 					//printf ("%lf %f %d\n", control.cFlux, acfStructure.probability, nMax);
 				}
 					
-				printf ("%d %lf %lf %f %lf %d\n", control.nsub, control.whiteLevel, noiseStructure.detection, control.cFlux, acfStructure.probability, nMax);
+				printf ("%d %d %lf %lf %f %lf %d\n", control.nsub, control.nchan, control.whiteLevel, noiseStructure.detection, control.cFlux, acfStructure.probability, nMax);
 				fflush (stdout);
 
 				deallocateMemory (&acfStructure);
